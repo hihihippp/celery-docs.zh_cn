@@ -8,7 +8,7 @@
 .. toctree::
     :maxdepth: 2
 
-    introduction
-    broker-installation
-    first-steps-with-celery
-    resources
+    介绍
+    安装 broker
+    开始 celery 的第一步
+    扩展阅读资源
