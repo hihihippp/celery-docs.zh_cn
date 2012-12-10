@@ -1,7 +1,7 @@
 .. _tut-celery:
 
 ========================
- First steps with Celery
+ 开始 Celery 的第一步
 ========================
 
 .. contents::
@@ -9,55 +9,46 @@
 
 .. _celerytut-broker:
 
-Choosing your Broker
+选择你的 Broker
 ====================
 
-Before you can use Celery you need to choose, install and run a broker.
-The broker is the service responsible for receiving and delivering task
-messages.
+在你正式开始使用 Celery 之前，你需要选择、安装并运行一个 broker。
+Broker 是一种负责接收、发送任务消息（task messages）的服务
 
-There are several choices available, including:
+你可以从以下几种 broker 中选择一个：
 
 * `RabbitMQ`_
 
-Feature-complete, safe and durable. If not losing tasks
-is important to you, then this is your best option.
+功能完整、安全、饱经实践检验的 broker。如果对你而言，不丢失消息非常重要，RabbitMQ 将是你最好的选择。
 
-See :ref:`broker-installation` for more about installing and configuring
-RabbitMQ.
+请查看 :ref:`broker-installation` 以便获得更多关于 RabbitMQ 安装和配置相关的信息。
 
 * `Redis`_
 
-Also feature-complete, but power failures or abrubt termination
-may result in data loss.
+也是一个功能完整的 broker，但电源故障或异常将导致数据丢失。
 
-See :ref:`otherqueues-redis` for configuration details.
+请查看 :ref:`otherqueues-redis` 以便配置相关的信息。
 
-* Databases
+* 数据库
 
-Using a database as a message queue is not recommended, but can be sufficient
-for very small installations.  Celery can use the SQLAlchemy and Django ORMS.
-See :ref:`otherqueues-sqlalchemy` or :ref:`otherqueues-django`.
+不推荐使用数据库作为消息队列，但在非常小的应用中可以使用。Celery 可以使用 SQLAlchemy 和 Django ORMS。
+请查看 :ref:`otherqueues-sqlalchemy` 或 :ref:`otherqueues-django`。
 
-* and more.
+* 更多其他选择。
 
-In addition to the above, there are several other transport implementations
-to choose from, including CouchDB, Beanstalk, MongoDB, and SQS.  See the Kombu
-documentation for more information.
+除了上面列出的以外，还有其他可以选择的传输实现，例如 CouchDB, Beanstalk, MongoDB, and SQS。请查阅 Kombu 的文档以便获得更多信息。
 
 .. _`RabbitMQ`: http://www.rabbitmq.com/
 .. _`Redis`: http://redis.io/
 
 .. _celerytut-simple-tasks:
 
-Creating a simple task
+创建一个简单任务（Task）
 ======================
 
-In this tutorial we are creating a simple task that adds two
-numbers.  Tasks are defined in normal Python modules.
+在这个教程里，我们将创建一个简单的任务（Task） —— 把两个数加起来。通常，我们在 Python 的模块中定义任务。
 
-By convention we will call our module :file:`tasks.py`, and it looks
-like this:
+按照惯例，我们将调用我们的模块 :file:`tasks.py`，看起来会像这个样子：
 
 :file: `tasks.py`
 
