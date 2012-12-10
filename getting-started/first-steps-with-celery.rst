@@ -31,8 +31,7 @@ Broker 是一种负责接收、发送任务消息（task messages）的服务
 
 * 数据库
 
-不推荐使用数据库作为消息队列，但在非常小的应用中可以使用。Celery 可以使用 SQLAlchemy 和 Django ORMS。
-请查看 :ref:`otherqueues-sqlalchemy` 或 :ref:`otherqueues-django`。
+不推荐使用数据库作为消息队列，但在非常小的应用中可以使用。Celery 可以使用 SQLAlchemy 和 Django ORMS。请查看 :ref:`otherqueues-sqlalchemy` 或 :ref:`otherqueues-django`。
 
 * 更多其他选择。
 
@@ -43,12 +42,12 @@ Broker 是一种负责接收、发送任务消息（task messages）的服务
 
 .. _celerytut-simple-tasks:
 
-创建一个简单任务（Task）
+创建一个简单“任务”（Task）
 ======================
 
-在这个教程里，我们将创建一个简单的任务（Task） —— 把两个数加起来。通常，我们在 Python 的模块中定义任务。
+在这个教程里，我们将创建一个简单的“任务”（Task） —— 把两个数加起来。通常，我们在 Python 的模块中定义“任务”。
 
-按照惯例，我们将调用我们的模块 :file:`tasks.py`，看起来会像这个样子：
+按照惯例，我们将调用模块 :file:`tasks.py`，看起来会像这个样子：
 
 :file: `tasks.py`
 
@@ -61,78 +60,63 @@ Broker 是一种负责接收、发送任务消息（task messages）的服务
         return x + y
 
 
-Behind the scenes the `@task` decorator actually creates a class that
-inherits from :class:`~celery.task.base.Task`.  The best practice is to
-only create custom task classes when you want to change generic behavior,
-and use the decorator to define tasks.
+此时， `@task` 装饰器实际上创建了一个继承自 :class:`~celery.task.base.Task` 的“类”（class）。除非需要修改“任务类”的缺省行为，否则我们推荐只通过装饰器定义“任务”（这是我们推崇的最佳实践）。
 
 .. seealso::
 
-    The full documentation on how to create tasks and task classes is in the
-    :doc:`../userguide/tasks` part of the user guide.
+    关于创建任务和任务类的完整文档可以在 :doc:`../userguide/tasks` 中找到。
 
 .. _celerytut-conf:
 
-Configuration
+配置
 =============
 
-Celery is configured by using a configuration module.  By default
-this module is called :file:`celeryconfig.py`.
+Celery 使用一个配置模块来进行配置。这个模块缺省北命名为 :file:`celeryconfig.py`。
 
-The configuration module must either be in the current directory
-or on the Python path, so that it can be imported.
+为了能被 import，这个配置模块要么存在于当前目录，要么包含在 Python 路径中。
 
-You can also set a custom name for the configuration module by using
-the :envvar:`CELERY_CONFIG_MODULE` environment variable.
+同时，你可以通过使用环境变量 :envvar:`CELERY_CONFIG_MODULE` 来随意修改这个配置文件的名字。
 
-Let's create our :file:`celeryconfig.py`.
+现在来让我们创建配置文件 :file:`celeryconfig.py`.
 
-1. Configure how we communicate with the broker (RabbitMQ in this example)::
+1. 配置如何连接 broker（例子中我们使用 RabbitMQ）::
 
         BROKER_URL = "amqp://guest:guest@localhost:5672//"
 
-2. Define the backend used to store task metadata and return values::
+2. 定义用于存储元数据（metadata）和返回值（return values）的后端::
 
         CELERY_RESULT_BACKEND = "amqp"
 
-   The AMQP backend is non-persistent by default, and you can only
-   fetch the result of a task once (as it's sent as a message).
+   AMQP 后端缺省是非持久化的，你只能取一次结果（一条消息）。
 
-   For list of backends available and related options see
-   :ref:`conf-result-backend`.
+   可以阅读 :ref:`conf-result-backend` 了解可以使用的后端清单和相关参数。
 
-3. Finally we list the modules the worker should import.  This includes
-   the modules containing your tasks.
+3. 最后，我们列出 worker 需要 import 的模块，包括你的任务。
 
-   We only have a single task module, :file:`tasks.py`, which we added earlier::
+   我们只有一个刚开始添加的任务模块 :file:`tasks.py`::
 
         CELERY_IMPORTS = ("tasks", )
 
-That's it.
+这就行了。
 
-There are more options available, like how many processes you want to
-use to process work in parallel (the :setting:`CELERY_CONCURRENCY` setting),
-and we could use a persistent result store backend, but for now, this should
-do.  For all of the options available, see :ref:`configuration`.
+你还有更多的选项可以使用，例如：你期望使用多少个进程来并行处理（:setting:`CELERY_CONCURRENCY` 设置），或者使用持久化的结果保存后端。可以阅读 :ref:`configuration` 查看更多的选项。
 
 .. note::
 
-    You can also specify modules to import using the :option:`-I` option to
-    :mod:`~celery.bin.celeryd`::
+    你可以使用选项 :mod:`~celery.bin.celeryd`:: 的 :option:`-I` 来指定要加载的模块
+    
 
         $ celeryd -l info -I tasks,handlers
 
-    This can be a single, or a comma separated list of task modules to import
-    when :program:`celeryd` starts.
+    可以在 :program:`celeryd` 启动时，指定加载单个或加载多个模块（通过 , 分隔的模块清单来实现）。
 
 
 .. _celerytut-running-celeryd:
 
-Running the celery worker server
+运行 worker 服务器
 ================================
 
-To test we will run the worker server in the foreground, so we can
-see what's going on in the terminal::
+为了方便测试，我们将在前台运行 worker 服务器，这样我们就能在终端上看到 celery 上发生的事情::
 
     $ celeryd --loglevel=INFO
 
