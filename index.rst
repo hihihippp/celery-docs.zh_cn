@@ -1,8 +1,8 @@
 =================================
- Celery - Distributed Task Queue
+ Celery - 分布式任务队列
 =================================
 
-Contents:
+内容:
 
 .. toctree::
     :maxdepth: 2
