@@ -1,7 +1,7 @@
 .. _guide-sets:
 
 =======================================
- Sets of tasks, Subtasks and Callbacks
+ 任务，子任务和回调的集合
 =======================================
 
 .. contents::
@@ -9,39 +9,35 @@
 
 .. _sets-subtasks:
 
-Subtasks
+子任务
 ========
 
 .. versionadded:: 2.0
 
-The :class:`~celery.task.sets.subtask` type is used to wrap the arguments and
-execution options for a single task invocation::
+:class:`~celery.task.sets.subtask` 类型设计用于对某单一任务的参数和执行选项进行包装::
 
     subtask(task_name_or_cls, args, kwargs, options)
 
-For convenience every task also has a shortcut to create subtasks::
+为了方便，每个任务都有一个子任务::
 
     task.subtask(args, kwargs, options)
 
-:class:`~celery.task.sets.subtask` is actually a :class:`dict` subclass,
-which means it can be serialized with JSON or other encodings that doesn't
-support complex Python objects.
+:class:`~celery.task.sets.subtask` 实际上是一个 :class:`dict` 子类，也就是说他可以被 JSON 或其他编码方式序列化，但并不支持复杂的 Python 对象。
 
-Also it can be regarded as a type, as the following usage works::
+同时也可被视为一个数据类型，下列用法也是可行的::
 
     >>> s = subtask("tasks.add", args=(2, 2), kwargs={})
 
     >>> subtask(dict(s))  # coerce dict into subtask
 
-This makes it excellent as a means to pass callbacks around to tasks.
+这使得其非常适用于在任务间传递回调的场景。
 
 .. _sets-callbacks:
 
-Callbacks
+回调
 ---------
 
-Let's improve our `add` task so it can accept a callback that
-takes the result as an argument::
+我们来改进 `add` 任务，通过使用回调，使其能够将结果作为输入参数使用::
 
     from celery.task import task
     from celery.task.sets import subtask

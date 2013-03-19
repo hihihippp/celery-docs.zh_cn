@@ -120,12 +120,9 @@ Celery 使用一个配置模块来进行配置。这个模块缺省北命名为 
 
     $ celeryd --loglevel=INFO
 
-In production you will probably want to run the worker in the
-background as a daemon.  To do this you need to use the tools provided
-by your platform, or something like `supervisord`_ (see :ref:`daemonizing`
-for more information).
+在生产环境中，也许你希望将 worker 在后台以守护进程的方式运行。如果你希望这么做，你可以利用平台或者类似于 `supervisord`_ (查阅 :ref:`daemonizing` 以获得更多信息） 的工具来实现。
 
-For a complete listing of the command line options available, do::
+可以通过下列命令行获得完整的命令参数清单::
 
     $  celeryd --help
 
@@ -133,81 +130,62 @@ For a complete listing of the command line options available, do::
 
 .. _celerytut-executing-task:
 
-Executing the task
+执行任务（task）
 ==================
 
-Whenever we want to execute our task, we use the
-:meth:`~celery.task.base.Task.delay` method of the task class.
+我们通过调用 class 类的 :meth:`~celery.task.base.Task.delay` 方法执行任务。
 
-This is a handy shortcut to the :meth:`~celery.task.base.Task.apply_async`
-method which gives greater control of the task execution (see
-:ref:`guide-executing`).
+:meth:`~celery.task.base.Task.apply_async` 方法一个非常方便的方法，通过这个方法我们可以充分控制控制任务执行的参数（参见 :ref:`guide-executing`）。
 
     >>> from tasks import add
     >>> add.delay(4, 4)
     <AsyncResult: 889143a6-39a2-4e52-837b-d80d33efb22d>
 
-At this point, the task has been sent to the message broker. The message
-broker will hold on to the task until a worker server has consumed and
-executed it.
+此时，任务已经被发送到了消息 broker。直到有 worker 服务器取走并执行了这个任务，否则 Broker 将一直保存这个消息。
 
-Right now we have to check the worker log files to know what happened
-with the task.  Applying a task returns an
-:class:`~celery.result.AsyncResult`, if you have configured a result store
-the :class:`~celery.result.AsyncResult` enables you to check the state of
-the task, wait for the task to finish, get its return value
-or exception/traceback if the task failed, and more.
+现在我们可以使用任务返回类 :class:`~celery.result.AsyncResult` 来查看 worker 的日志，看看到底发生了什么。如果你配置了一个结果存储类 :class:`~celery.result.AsyncResult` 来保存任务状态，任务执行完毕可获得返回值；任务执行失败则可获得异常/回调等信息。
 
-Keeping Results
+保留结果
 ---------------
 
-If you want to keep track of the tasks state, Celery needs to store or send
-the states somewhere.  There are several
-built-in backends to choose from: SQLAlchemy/Django ORM, Memcached, Redis,
-AMQP, MongoDB, Tokyo Tyrant and Redis -- or you can define your own.
+如果你想跟踪任务状态，Celery 就需要把这些状态信息发送并存储到某处。你可以使用多种后端来达到这个目的: SQLAlchemy/Django ORM, Memcached, Redis,
+AMQP, MongoDB, Tokyo Tyrant 和 Redis —— 甚至你可以定义你自己的。
 
-For this example we will use the `amqp` result backend, which sends states
-as messages.  The backend is configured via the ``CELERY_RESULT_BACKEND``
-option, in addition individual result backends may have additional settings
-you can configure::
+在这里，我们将使用 `amqp` 作为保存结果的后端来存储状态消息。可以通过 ``CELERY_RESULT_BACKEND`` 来修改后端选项，你可以用于保存结果后端的选项有::
 
     CELERY_RESULT_BACKEND = "amqp"
 
-    #: We want the results to expire in 5 minutes, note that this requires
-    #: RabbitMQ version 2.1.1 or higher, so please comment out if you have
-    #: an earlier version.
+    #: 我们希望结果最多保存 5 分钟。 
+    #: 注意，这个特性需要 2.1.1 以上版本 RabbitMQ 才能支持。
+    #: 如果你使用的是早期版本的 RabbitMQ，请注释下面这行。
     CELERY_TASK_RESULT_EXPIRES = 300
 
-To read more about result backends please see :ref:`task-result-backends`.
+请通过阅读 :ref:`task-result-backends` 获得更多相关配置的信息。
 
-Now with the result backend configured, let's execute the task again.
-This time we'll hold on to the :class:`~celery.result.AsyncResult`::
+现在，我们配置好了保存结果的后端，让我们重新来执行任务。我们再次使用类 :class:`~celery.result.AsyncResult`::
 
     >>> result = add.delay(4, 4)
 
-Here's some examples of what you can do when you have results::
+这里是一些你可以如何处理结果的方法::
 
-    >>> result.ready() # returns True if the task has finished processing.
+    >>> result.ready() # 任务是否已经执行，如果已经执行完毕，返回值为 True。
     False
 
-    >>> result.result # task is not ready, so no return value yet.
+    >>> result.result # 任务还没完成，尚无返回值。
     None
 
-    >>> result.get()   # Waits until the task is done and returns the retval.
+    >>> result.get()   # 等待，直到任务执行完毕并返回值。
     8
 
-    >>> result.result # direct access to result, doesn't re-raise errors.
+    >>> result.result # 直接返回结果，不产生任何错误。
     8
 
-    >>> result.successful() # returns True if the task didn't end in failure.
+    >>> result.successful() # 任务是否成功执行，如果成功则返回值 True。
     True
 
-If the task raises an exception, the return value of `result.successful()`
-will be :const:`False`, and `result.result` will contain the exception instance
-raised by the task.
+如果任务执行过程中发生了异常，`result.successful()` 的返回值将会变成 :const:`False`，同时 `result.result` 将包含一个由 task 产生的异常实例。
 
-Where to go from here
+继续阅读
 =====================
 
-After this you should read the :ref:`guide`. Specifically
-:ref:`guide-tasks` and :ref:`guide-executing`.
+请继续阅读 :ref:`guide` 中的 :ref:`guide-tasks` 和 :ref:`guide-executing`。

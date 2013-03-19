@@ -1,7 +1,7 @@
 .. _guide-worker:
 
 ===============
- Workers Guide
+ Workers 手册
 ===============
 
 .. contents::
@@ -9,25 +9,20 @@
 
 .. _worker-starting:
 
-Starting the worker
+启动 worker
 ===================
 
-You can start celeryd to run in the foreground by executing the command::
+你可以通过下列命令在前台启动 celeryd::
 
     $ celeryd --loglevel=INFO
 
-You probably want to use a daemonization tool to start
-`celeryd` in the background.  See :ref:`daemonizing` for help
-using `celeryd` with popular daemonization tools.
+你也许会想用守护进程类工具使 `celeryd` 在后台工作。请查看 :ref:`daemonizing` 如何使用流行的守护进程工具调用 `celeryd`。
 
-For a full list of available command line options see
-:mod:`~celery.bin.celeryd`, or simply do::
+查看 :mod:`~celery.bin.celeryd` 了解完整的命令行参数清单，或通过执行::
 
     $ celeryd --help
 
-You can also start multiple workers on the same machine. If you do so
-be sure to give a unique name to each individual worker by specifying a
-host name with the :option:`--hostname|-n` argument::
+你可以在同一台服务器上启动多个 worker，但一定要为每个 worker 指定唯一的名称（可以通过 :option:`--hostname|-n` 参数实现）::
 
     $ celeryd --loglevel=INFO --concurrency=10 -n worker1.example.com
     $ celeryd --loglevel=INFO --concurrency=10 -n worker2.example.com
@@ -35,25 +30,16 @@ host name with the :option:`--hostname|-n` argument::
 
 .. _worker-stopping:
 
-Stopping the worker
+关闭 worker
 ===================
 
-Shutdown should be accomplished using the :sig:`TERM` signal.
+发送 :sig:`TERM` 信号即可关闭 worker。
 
-When shutdown is initiated the worker will finish all currently executing
-tasks before it actually terminates, so if these tasks are important you should
-wait for it to finish before doing anything drastic (like sending the :sig:`KILL`
-signal).
+收到关闭信号以后，worker 还会继续将当前任务完成才真正关闭。如果这个任务对你而言真的很重要，建议不要在任务完成前进行其他激烈的行为（例如，发送 :sig:`KILL` 信号）。
 
-If the worker won't shutdown after considerate time, for example because
-of tasks stuck in an infinite-loop, you can use the :sig:`KILL` signal to
-force terminate the worker, but be aware that currently executing tasks will
-be lost (unless the tasks have the :attr:`~celery.task.base.Task.acks_late`
-option set).
+当 worker 迟迟不能关闭, 例如陷入了无限循环, 可以考虑向其发送 :sig:`KILL` 信号来强制终止 worker。但这样会导致当前任务丢失（除非任务设置了 :attr:`~celery.task.base.Task.acks_late` 选项）。
 
-Also as processes can't override the :sig:`KILL` signal, the worker will
-not be able to reap its children, so make sure to do so manually.  This
-command usually does the trick::
+Worker 进程并不能确保所有子进程都能收到 :sig:`KILL` 信号，在此情况下可以通过手动执行来确保子进程被杀死。可以使用以下的命令::
 
     $ ps auxww | grep celeryd | awk '{print $2}' | xargs kill -9
 
@@ -72,13 +58,10 @@ arguments as it was started with.
 
 .. _worker-concurrency:
 
-Concurrency
+兵法
 ===========
 
-By default multiprocessing is used to perform concurrent execution of tasks,
-but you can also use :ref:`Eventlet <concurrency-eventlet>`.  The number
-of worker processes/threads can be changed using the :option:`--concurrency`
-argument and defaults to the number of CPUs available on the machine.
+缺省情况下 celery 使用多进程模型来并发执行任务，你也可以使用 :ref:`Eventlet <concurrency-eventlet>`。可以通过 :option:`--concurrency` 参数来设置进程/线程的数量（缺省等于计算机的 CPU 数）。
 
 .. admonition:: Number of processes (multiprocessing)
 
@@ -178,14 +161,12 @@ to `celeryd` or using the :setting:`CELERYD_MAX_TASKS_PER_CHILD` setting.
 
 .. _worker-remote-control:
 
-Remote control
+远程控制
 ==============
 
 .. versionadded:: 2.0
 
-Workers have the ability to be remote controlled using a high-priority
-broadcast message queue.  The commands can be directed to all, or a specific
-list of workers.
+可以通过高优先级的广播进行远程控制。命令将被发送到全部或者部分 worker。
 
 Commands can also have replies.  The client can then wait for and collect
 those replies.  Since there's no central authority to know how many
