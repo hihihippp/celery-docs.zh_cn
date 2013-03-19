@@ -1,7 +1,7 @@
 .. _broker-installation:
 
 =====================
- Broker Installation
+ 安装 Broker
 =====================
 
 .. contents::
@@ -9,29 +9,26 @@
 
 .. _installing-rabbitmq:
 
-Installing RabbitMQ
+安装 RabbitMQ
 ===================
 
-See `Installing RabbitMQ`_ over at RabbitMQ's website. For Mac OS X
-see `Installing RabbitMQ on OS X`_.
+请在 RabbitMQ 的网站上查阅 `Installing RabbitMQ`_ 的内容. 如果在 Mac OS X 上安装，请查阅 `Installing RabbitMQ on OS X`_.
 
 .. _`Installing RabbitMQ`: http://www.rabbitmq.com/install.html
 
 .. note::
 
-    If you're getting `nodedown` errors after installing and using
-    :program:`rabbitmqctl` then this blog post can help you identify
-    the source of the problem:
+    如果你在安装后运行 :program:`rabbitmqctl` 程序遇到了 `nodedown` 错误，
+    请查阅下面这篇 blog 文章。这篇文章可以帮助你找到问题的根源:
 
         http://somic.org/2009/02/19/on-rabbitmqctl-and-badrpcnodedown/
 
 .. _rabbitmq-configuration:
 
-Setting up RabbitMQ
+配置 RabbitMQ
 ===================
 
-To use celery we need to create a RabbitMQ user, a virtual host and
-allow that user access to that virtual host::
+在使用 celery 前，你需要创建一个 RabbbitMQ 用户、一个虚拟主机（vhost），并且允许用户访问这个虚拟主机::
 
     $ rabbitmqctl add_user myuser mypassword
 
@@ -39,7 +36,7 @@ allow that user access to that virtual host::
 
     $ rabbitmqctl set_permissions -p myvhost myuser ".*" ".*" ".*"
 
-See the RabbitMQ `Admin Guide`_ for more information about `access control`_.
+请查阅 RabbitMQ 的 `Admin Guide`_ 并查阅 `access control`_ 相关的内容.
 
 .. _`Admin Guide`: http://www.rabbitmq.com/admin-guide.html
 

@@ -1,7 +1,7 @@
 .. _resources:
 
 ===========
- Resources
+ 其他资源
 ===========
 
 .. contents::

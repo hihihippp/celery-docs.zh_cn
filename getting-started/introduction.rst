@@ -1,7 +1,7 @@
 .. _intro:
 
 ==============
- Introduction
+ 介绍
 ==============
 
 .. include:: ../includes/introduction.txt

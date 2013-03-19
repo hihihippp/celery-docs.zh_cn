@@ -1,5 +1,5 @@
 =================
- Getting Started
+ Getting Started 入门教程
 =================
 
 :Release: |version|
